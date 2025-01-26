@@ -1,11 +1,22 @@
-const express = require('express'); //เรียกใช้ express ผ่าน require
-const myApp = express(); //สร้างตัวแปร myApp เพื่อใช้งาน express 
-const port = 3000; //พอร์ตของ Server ที่ใช้ในการเปิด Localhost 
+const express = require('express');
+const port = 3000;
+const { readdirSync } = require('fs');
+const morgan = require('morgan');
+const cors = require('cors');
+const bodyParse = require('body-parser');
 
-myApp.get('/', (req, res) => {
+const app = express();
+app.use(morgan('dev'));
+app.use(cors());
+app.use(bodyParse.json({ limit: '10mb'}))
+
+app.get('/', (req, res) => {
   res.send('Hello World!');
 }); 
 
-myApp.listen(port, () => {
+readdirSync('./routes')
+  .map((r) => app.use('/api', require('./routes/' + r)))
+
+app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}/`);
 });
